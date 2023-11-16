@@ -302,7 +302,7 @@ data |>
 
 <img src="hw5_files/figure-gfm/unnamed-chunk-8-1.png" width="90%" />
 From the spaghetti plot, we know that overall the observation increases
-as time increases, but the values within a certain time are flunctuated.
+as time increases, but the values within a certain time are fluctuated.
 
 ### Problem 3
 
@@ -317,7 +317,7 @@ t_test =
     
   }
 
-sim_results_df =
+sim_df =
   expand_grid(
     mu = 0,
     iter = 1:5000
@@ -327,7 +327,7 @@ sim_results_df =
 ```
 
 ``` r
-sim2_results_df = 
+sim2_df = 
   expand_grid(
     mu = c(1:6),
     iter = 1:5000
@@ -335,7 +335,7 @@ sim2_results_df =
   mutate(test_result = map(mu, t_test, n = 30, sigma = 5)) |> 
   unnest(test_result)
 
-sim2_results_df |> 
+sim2_df |> 
   group_by(mu) |> 
   summarise(power = sum(p.value < 0.05) / n()) |> 
   ggplot(aes(x = mu, y = power)) + 
@@ -345,15 +345,18 @@ sim2_results_df |>
 ```
 
 <img src="hw5_files/figure-gfm/unnamed-chunk-10-1.png" width="90%" />
+From above we could observe that the power increases as the effect size
+increases, eventually it will approaches 1. Also the slope of this curve
+is decreasing along the true mean.
 
 ``` r
-sim2_results_df |> 
+sim2_df |> 
   group_by(mu) |> 
   summarise(mean_estimate = mean(estimate)) |> 
   ggplot(aes(x = mu, y = mean_estimate)) +
   geom_line(aes(color = "all", lty = "all")) +
   geom_line(data = 
-              sim2_results_df |>
+              sim2_df |>
               filter(p.value < 0.05) |> 
               group_by(mu) |> 
               summarise(mean_estimate = mean(estimate)),
@@ -364,3 +367,9 @@ sim2_results_df |>
 ```
 
 <img src="hw5_files/figure-gfm/unnamed-chunk-11-1.png" width="90%" />
+The average estimate follows the distribution:
+$\bar X\sim N(\mu, \frac{\sigma^2}{n}).$ So as $\sigma$ and $n$ are
+equal, there will be higher possibility to reject the null as $\mu$
+increases. The gap between the average estimate and the real value are
+positive related. The more rejects, the greater the gap. Thus, the gap
+decreases as $\mu$ increases.
